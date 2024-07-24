@@ -1,35 +1,35 @@
-import React, {useState, useContext} from 'react';
-import {useHistory} from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const {login} = useContext(AuthContext);
-  const history = useHistory();
+const Login = ({ setAuth }) => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
-    history.push('/dashboard');
+    // Replace with your login logic
+    const res = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+    if (data.token) {
+      setAuth({ token: data.token, role: data.role });
+      navigate('/dashboard');
+    } else {
+      console.error('Login failed');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder = "Password"
-        required
-      />
+      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" />
+      <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" />
       <button type="submit">Login</button>
     </form>
   );
