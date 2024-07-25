@@ -14,7 +14,6 @@ const Register = () => {
         },
         body: JSON.stringify({ username, password }),
       });
-      const data = await response.json();
       if (response.ok) {
         console.log('Registration successful');
       } else {
